@@ -1,0 +1,6 @@
+@WebPageMonitor.API_HostAddress = http://localhost:5011
+
+GET {{WebPageMonitor.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
