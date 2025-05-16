@@ -1,0 +1,64 @@
+﻿@page "/changelog"
+@layout MainLayout
+@inject ChangeLogService ChangeLogService
+@using WebPageMonitor.Core.Entities
+
+<h3>История изменений</h3>
+
+<select class="form-select mt-3 mb-3" @onchange="FilterLogs">
+    <option value="">-- Все сайты --</option>
+    <option value="Gismeteo">Gismeteo</option>
+</select>
+
+
+@if (logs == null)
+{
+    <p>Загрузка...</p>
+}
+else if (!logs.Any())
+{
+    <p>Нет данных об изменениях.</p>
+}
+else
+{
+    <table class="table table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Сайт</th>
+                <th>Подробнее</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in logs)
+            {
+                <tr>
+                    <td>@log.ChangeDate.ToLocalTime():g</td>
+                    <td>@log.SiteType</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" href="/changes/@log.Id">🔍</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private string? selectedSiteType;
+    private IEnumerable<WebPageMonitor.Core.Entities.ChangeLog>? logs;
+    private IEnumerable<WebPageMonitor.Core.Entities.ChangeLog>? allLogs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        allLogs = await ChangeLogService.GetAllAsync();
+        logs = allLogs;
+    }
+    private void FilterLogs(ChangeEventArgs e)
+    {
+        selectedSiteType = e.Value?.ToString();
+        logs = string.IsNullOrEmpty(selectedSiteType)
+            ? allLogs
+            : allLogs?.Where(l => l.SiteType.ToString() == selectedSiteType);
+    }
+}

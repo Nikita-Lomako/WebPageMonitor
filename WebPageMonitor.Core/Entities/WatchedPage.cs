@@ -14,9 +14,10 @@ namespace WebPageMonitor.Core.Entities
     {
         public int Id { get; set; }
         public string Url { get; set; } = string.Empty;
-        public WebSiteType Type { get; set; } // Train или Weather
+        public WebSiteType Type { get; set; }
         public TimeSpan CheckInterval { get; set; }
         public DateTime LastChecked { get; set; }
         public List<PageVersion> Versions { get; set; } = new List<PageVersion>();
     }
+
 }

@@ -12,11 +12,13 @@ namespace WebPageMonitor.Core.Entities
     public class ChangeLog
     {
         public int Id { get; set; }
-        public string DiffContent { get; set; } = string.Empty; // JSON различий
-        public WebSiteType SiteType { get; set; } // Для фильтрации по типу
+        public string DiffContent { get; set; } = string.Empty;
+        public WebSiteType SiteType { get; set; }
         public DateTime ChangeDate { get; set; }
         public int PageVersionId { get; set; }
-        public PageVersion PageVersion { get; set; } = new PageVersion();
+        [System.Text.Json.Serialization.JsonIgnore]
+        public PageVersion? PageVersion { get; set; }
     }
+
 }
 

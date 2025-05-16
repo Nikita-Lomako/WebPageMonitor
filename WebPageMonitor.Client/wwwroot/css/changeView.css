@@ -1,0 +1,18 @@
+﻿.diff-container {
+    display: flex;
+    gap: 20px;
+}
+
+.diff-old {
+    background-color: #ffe6e6;
+    padding: 1rem;
+    flex: 1;
+    border: 1px solid #f5c2c2;
+}
+
+.diff-new {
+    background-color: #e6ffec;
+    padding: 1rem;
+    flex: 1;
+    border: 1px solid #b6f0c2;
+}

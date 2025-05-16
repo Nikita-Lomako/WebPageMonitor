@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 using WebPageMonitor.Core.Entities;
 using WebPageMonitor.Core.Parsers;
 using WebPageMonitor.Infrastructure.Repositories;
-using System.Security.Cryptography;
 using WebPageMonitor.Infrastructure.Parsers;
+using WebPageMonitor.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace WebPageMonitor.Infrastructure.Services
 {
@@ -20,68 +21,120 @@ namespace WebPageMonitor.Infrastructure.Services
         private readonly IPageVersionRepository _pageVersionRepo;
         private readonly IChangeLogRepository _changeLogRepo;
         private readonly GismeteoParser _parser;
+        private readonly ILogger<GismeteoService> _logger;
 
         public GismeteoService(
             IWatchedPageRepository watchedPageRepo,
             IPageVersionRepository pageVersionRepo,
             IChangeLogRepository changeLogRepo,
-             GismeteoParser parser)  // ← конкретный парсер
+            GismeteoParser parser,
+            ILogger<GismeteoService> logger)
         {
             _watchedPageRepo = watchedPageRepo;
             _pageVersionRepo = pageVersionRepo;
             _changeLogRepo = changeLogRepo;
             _parser = parser;
+            _logger = logger;
         }
 
         public async Task CheckUpdatesAsync(int watchedPageId)
         {
-            var watchedPage = await _watchedPageRepo.GetByIdAsync(watchedPageId);
-            if (watchedPage == null) throw new Exception("Page not found");
-
-            var html = await _parser.GetPageContentAsync(watchedPage.Url);
-
-            var lastVersion = await _pageVersionRepo.GetLatestVersionAsync(watchedPageId);
-
-            var hash = ComputeHash(html);
-
-            if (lastVersion == null || lastVersion.ContentHash != hash)
+            try
             {
-                var newVersion = new PageVersion
+                var watchedPage = await _watchedPageRepo.GetByIdAsync(watchedPageId);
+                if (watchedPage == null)
                 {
-                    Content = html,
-                    ContentHash = hash,
-                    Timestamp = DateTime.UtcNow,
-                    WatchedPageId = watchedPageId
-                };
-                await _pageVersionRepo.AddAsync(newVersion);
-
-                if (lastVersion != null)
-                {
-                    var diff = InlineDiffBuilder.Diff(lastVersion.Content, html);
-                    var diffContent = SerializeDiff(diff);
-
-                    var changeLog = new ChangeLog
-                    {
-                        DiffContent = diffContent,
-                        SiteType = watchedPage.Type,
-                        ChangeDate = DateTime.UtcNow,
-                        PageVersion = newVersion
-                    };
-                    await _changeLogRepo.AddAsync(changeLog);
+                    _logger.LogError("Page not found with ID: {PageId}", watchedPageId);
+                    throw new Exception("Page not found");
                 }
+
+                var newWeatherData = await _parser.GetWeatherDataAsync(watchedPage.Url);
+                var newJson = JsonSerializer.Serialize(newWeatherData);
+
+                var lastVersion = await _pageVersionRepo.GetLatestVersionAsync(watchedPageId);
+
+                if (lastVersion == null)
+                {
+                    // First version
+                    var newVersion = new PageVersion
+                    {
+                        Content = newJson,
+                        Timestamp = DateTime.UtcNow,
+                        WatchedPageId = watchedPageId
+                    };
+                    await _pageVersionRepo.AddAsync(newVersion);
+                    _logger.LogInformation("Created first version for page {PageId}", watchedPageId);
+                }
+                else
+                {
+                    var oldWeather = JsonSerializer.Deserialize<WeatherData>(lastVersion.Content);
+                    if (oldWeather == null)
+                    {
+                        _logger.LogError("Failed to deserialize old weather data for page {PageId}", watchedPageId);
+                        throw new Exception("Failed to deserialize old weather data");
+                    }
+
+                    // Check if there are any actual changes
+                    bool hasChanges = false;
+                    if (oldWeather.TimeSlots.Count != newWeatherData.TimeSlots.Count)
+                    {
+                        hasChanges = true;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < oldWeather.TimeSlots.Count; i++)
+                        {
+                            if (!oldWeather.TimeSlots[i].Equals(newWeatherData.TimeSlots[i]))
+                            {
+                                hasChanges = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (hasChanges)
+                    {
+                        var newVersion = new PageVersion
+                        {
+                            Content = newJson,
+                            Timestamp = DateTime.UtcNow,
+                            WatchedPageId = watchedPageId
+                        };
+                        await _pageVersionRepo.AddAsync(newVersion);
+
+                        var diff = new WeatherChange
+                        {
+                            OldData = oldWeather,
+                            NewData = newWeatherData
+                        };
+
+                        var changeLog = new ChangeLog
+                        {
+                            DiffContent = JsonSerializer.Serialize(diff),
+                            SiteType = watchedPage.Type,
+                            ChangeDate = DateTime.UtcNow,
+                            PageVersion = newVersion,
+                            PageVersionId = newVersion.Id
+                        };
+
+                        await _changeLogRepo.AddAsync(changeLog);
+                        _logger.LogInformation("Changes detected and logged for page {PageId}", watchedPageId);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("No changes detected for page {PageId}", watchedPageId);
+                    }
+                }
+
+                // Update LastChecked timestamp regardless of whether there were changes
+                watchedPage.LastChecked = DateTime.UtcNow;
+                await _watchedPageRepo.UpdateAsync(watchedPage);
             }
-        }
-
-        private string ComputeHash(string input)
-        {
-            using var sha = SHA256.Create();
-            var bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
-            return Convert.ToBase64String(bytes);
-        }
-
-        private string SerializeDiff(DiffPaneModel diff)
-        {
-            return JsonSerializer.Serialize(diff.Lines);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking updates for page {PageId}", watchedPageId);
+                throw;
+            }
         }
     }
 }

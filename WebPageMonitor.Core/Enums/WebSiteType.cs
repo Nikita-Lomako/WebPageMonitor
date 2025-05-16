@@ -8,8 +8,7 @@ namespace WebPageMonitor.Core.Enums
 {
     public enum WebSiteType
     {
-        Train,
-        Weather
+        Gismeteo
     }
 }
 

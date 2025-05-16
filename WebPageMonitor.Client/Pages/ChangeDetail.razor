@@ -1,0 +1,135 @@
+﻿@page "/changes/{changeLogId:int}"
+@inject ChangeLogService ChangeLogService
+@using System.Text.Json
+@using WebPageMonitor.Core.Models
+
+<h3>Изменения на сайте @SiteType</h3>
+
+@if (OldContent == null && NewContent == null)
+{
+    <p>Нет изменений.</p>
+}
+else if (SiteType == "Gismeteo")
+{
+    <div class="weather-changes">
+        @foreach (var timeSlot in NewContent?.TimeSlots ?? new List<TimeSlotData>())
+        {
+            var oldTimeSlot = OldContent?.TimeSlots.FirstOrDefault(t => t.Time == timeSlot.Time);
+            <div class="time-slot">
+                <h4>@timeSlot.Time</h4>
+                <div class="weather-data">
+                    <div class="data-row @(IsChanged(oldTimeSlot?.Temperature, timeSlot.Temperature))">
+                        <span class="label">Температура воздуха:</span>
+                        <span class="value">@timeSlot.Temperature</span>
+                    </div>
+                    <div class="data-row @(IsChanged(oldTimeSlot?.WindSpeed, timeSlot.WindSpeed))">
+                        <span class="label">Скорость ветра:</span>
+                        <span class="value">@timeSlot.WindSpeed @timeSlot.WindDirection</span>
+                    </div>
+                    <div class="data-row @(IsChanged(oldTimeSlot?.Humidity, timeSlot.Humidity))">
+                        <span class="label">Относительная влажность:</span>
+                        <span class="value">@timeSlot.Humidity</span>
+                    </div>
+                    <div class="data-row @(IsChanged(oldTimeSlot?.Pressure, timeSlot.Pressure))">
+                        <span class="label">Давление:</span>
+                        <span class="value">@timeSlot.Pressure</span>
+                    </div>
+                    <div class="data-row @(IsChanged(oldTimeSlot?.Precipitation, timeSlot.Precipitation))">
+                        <span class="label">Осадки:</span>
+                        <span class="value">@timeSlot.Precipitation</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="diff-container">
+        <div class="diff-old">
+            <h5>Было:</h5>
+            <pre>@OldContent</pre>
+        </div>
+        <div class="diff-new">
+            <h5>Стало:</h5>
+            <pre>@NewContent</pre>
+        </div>
+    </div>
+}
+
+<style>
+    .weather-changes {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .time-slot {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        border-radius: 4px;
+    }
+
+    .weather-data {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .data-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.25rem;
+        border-radius: 4px;
+    }
+
+    .data-row.changed {
+        background-color: #e6ffe6;
+    }
+
+    .label {
+        font-weight: bold;
+    }
+
+    .value {
+        min-width: 100px;
+        text-align: right;
+    }
+</style>
+
+@code {
+    [Parameter] public int changeLogId { get; set; }
+
+    private WeatherData? OldContent;
+    private WeatherData? NewContent;
+    private string SiteType = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var change = await ChangeLogService.GetChangeByIdAsync(changeLogId);
+            if (change == null)
+                return;
+
+            SiteType = change.SiteType.ToString() ?? string.Empty;
+
+            if (SiteType == "Gismeteo")
+            {
+                var weatherChange = JsonSerializer.Deserialize<WeatherChange>(change.DiffContent);
+                OldContent = weatherChange?.OldData;
+                NewContent = weatherChange?.NewData;
+            }
+        }
+        catch (JsonException ex)
+        {
+            // Логирование ошибки десериализации
+            Console.WriteLine($"JSON Error: {ex.Message}");
+        }
+    }
+
+    private string IsChanged(string? oldValue, string? newValue)
+    {
+        return oldValue != newValue ? "changed" : "";
+    }
+}

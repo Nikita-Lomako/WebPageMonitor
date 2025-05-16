@@ -29,5 +29,18 @@ namespace WebPageMonitor.Infrastructure.Repositories
             _context.ChangeLogs.Add(log);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<ChangeLog>> GetAllAsync()
+        {
+            return await _context.ChangeLogs
+                .OrderByDescending(c => c.ChangeDate)
+                .ToListAsync();
+        }
+
+        public async Task<ChangeLog?> GetByIdAsync(int id)
+        {
+            return await _context.ChangeLogs
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
     }
 }

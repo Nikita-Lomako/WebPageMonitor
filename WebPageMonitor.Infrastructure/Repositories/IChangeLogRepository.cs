@@ -11,6 +11,8 @@ namespace WebPageMonitor.Infrastructure.Repositories
     public interface IChangeLogRepository
     {
         Task<IEnumerable<ChangeLog>> GetBySiteTypeAsync(WebSiteType siteType);
+        Task<IEnumerable<ChangeLog>> GetAllAsync(); // Новый метод
         Task AddAsync(ChangeLog log);
+        Task<ChangeLog?> GetByIdAsync(int id);
     }
 }

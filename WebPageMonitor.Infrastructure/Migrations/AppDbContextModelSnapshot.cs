@@ -48,6 +48,16 @@ namespace WebPageMonitor.Infrastructure.Migrations
                     b.HasIndex("PageVersionId");
 
                     b.ToTable("ChangeLogs");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ChangeDate = new DateTime(2025, 5, 16, 19, 20, 0, 0, DateTimeKind.Utc),
+                            DiffContent = "{\"OldData\":{\"TimeSlots\":[{\"Time\":\"0:00\",\"Temperature\":\"5°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"90%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"3:00\",\"Temperature\":\"4°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"94%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"6:00\",\"Temperature\":\"3°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"99%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"9:00\",\"Temperature\":\"7°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"86%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"12:00\",\"Temperature\":\"9°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"74%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"15:00\",\"Temperature\":\"10°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"В\",\"Humidity\":\"74%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"0,9 мм\"},{\"Time\":\"18:00\",\"Temperature\":\"11°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"77%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"1,6 мм\"},{\"Time\":\"21:00\",\"Temperature\":\"9°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"В\",\"Humidity\":\"85%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"1,8 мм\"}],\"ObservationTime\":\"2025-05-16T16:36:45.3837758Z\"},\"NewData\":{\"TimeSlots\":[{\"Time\":\"0:00\",\"Temperature\":\"6°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"89%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"3:00\",\"Temperature\":\"4°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"Ю\",\"Humidity\":\"92%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"6:00\",\"Temperature\":\"3°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"99%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"9:00\",\"Temperature\":\"7°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"86%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"12:00\",\"Temperature\":\"9°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"74%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"15:00\",\"Temperature\":\"10°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"В\",\"Humidity\":\"74%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"0,9 мм\"},{\"Time\":\"18:00\",\"Temperature\":\"11°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"77%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"1,6 мм\"},{\"Time\":\"21:00\",\"Temperature\":\"9°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"В\",\"Humidity\":\"85%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"1,8 мм\"}],\"ObservationTime\":\"2025-05-16T16:36:45.3837758Z\"}}",
+                            PageVersionId = 2,
+                            SiteType = 0
+                        });
                 });
 
             modelBuilder.Entity("WebPageMonitor.Core.Entities.PageVersion", b =>
@@ -62,10 +72,6 @@ namespace WebPageMonitor.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContentHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
@@ -77,6 +83,22 @@ namespace WebPageMonitor.Infrastructure.Migrations
                     b.HasIndex("WatchedPageId");
 
                     b.ToTable("PageVersions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Content = "{\"TimeSlots\":[{\"Time\":\"0:00\",\"Temperature\":\"5°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"90%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"3:00\",\"Temperature\":\"4°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"94%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"6:00\",\"Temperature\":\"3°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"99%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"9:00\",\"Temperature\":\"7°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"86%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"12:00\",\"Temperature\":\"9°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"74%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"15:00\",\"Temperature\":\"10°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"В\",\"Humidity\":\"74%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"0,9 мм\"},{\"Time\":\"18:00\",\"Temperature\":\"11°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"77%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"1,6 мм\"},{\"Time\":\"21:00\",\"Temperature\":\"9°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"В\",\"Humidity\":\"85%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"1,8 мм\"}],\"ObservationTime\":\"2025-05-16T16:36:45.3837758Z\"}",
+                            Timestamp = new DateTime(2025, 5, 16, 18, 20, 0, 0, DateTimeKind.Utc),
+                            WatchedPageId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Content = "{\"TimeSlots\":[{\"Time\":\"0:00\",\"Temperature\":\"6°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"89%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"3:00\",\"Temperature\":\"4°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"Ю\",\"Humidity\":\"92%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"6:00\",\"Temperature\":\"3°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"99%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"9:00\",\"Temperature\":\"7°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"86%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"12:00\",\"Temperature\":\"9°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"74%\",\"Pressure\":\"744 мм рт.ст.\",\"Precipitation\":\"0 мм\"},{\"Time\":\"15:00\",\"Temperature\":\"10°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"В\",\"Humidity\":\"74%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"0,9 мм\"},{\"Time\":\"18:00\",\"Temperature\":\"11°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"ЮВ\",\"Humidity\":\"77%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"1,6 мм\"},{\"Time\":\"21:00\",\"Temperature\":\"9°C\",\"WindSpeed\":\" м/с\",\"WindDirection\":\"В\",\"Humidity\":\"85%\",\"Pressure\":\"743 мм рт.ст.\",\"Precipitation\":\"1,8 мм\"}],\"ObservationTime\":\"2025-05-16T16:36:45.3837758Z\"}",
+                            Timestamp = new DateTime(2025, 5, 16, 19, 20, 0, 0, DateTimeKind.Utc),
+                            WatchedPageId = 1
+                        });
                 });
 
             modelBuilder.Entity("WebPageMonitor.Core.Entities.WatchedPage", b =>
@@ -111,14 +133,6 @@ namespace WebPageMonitor.Infrastructure.Migrations
                             CheckInterval = new TimeSpan(0, 0, 0, 0, 0),
                             LastChecked = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = 0,
-                            Url = "https://pass.rw.by/ru/route/?from=%D0%9C%D0%B8%D0%BD%D1%81%D0%BA&from_exp=&from_esr=&to=%D0%93%D1%80%D0%BE%D0%B4%D0%BD%D0%BE&to_exp=&to_esr=&front_date=%D1%81%D0%B5%D0%B3%D0%BE%D0%B4%D0%BD%D1%8F&date=today"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CheckInterval = new TimeSpan(0, 0, 0, 0, 0),
-                            LastChecked = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = 1,
                             Url = "https://www.gismeteo.by/weather-grodno-4243/tomorrow/"
                         });
                 });
